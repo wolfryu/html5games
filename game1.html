@@ -503,17 +503,22 @@
     }
 
     // ========== 生成题目 ==========
-    function generateQuestion(max) {
+    // maxOperand: 运算数（符号两侧的数字）的最大值
+    // 例: maxOperand=10 → a,b 都是 1~10 (减法结果≥0)
+    //     加法结果可以超过10, 20以内同理
+    function generateQuestion(maxOperand) {
         const isAdd = Math.random() < 0.5;
 
         let a, b, answer;
 
         if (isAdd) {
-            a = randomInt(1, max - 1);
-            b = randomInt(1, max - a);
+            // 加法: a, b 各自 ≤ maxOperand, 结果不限
+            a = randomInt(1, maxOperand);
+            b = randomInt(1, maxOperand);
             answer = a + b;
         } else {
-            a = randomInt(2, max);
+            // 减法: a, b ≤ maxOperand, 且 a >= b 保证结果非负
+            a = randomInt(2, maxOperand);
             b = randomInt(1, a);
             answer = a - b;
         }
@@ -521,11 +526,13 @@
         const operator = isAdd ? ' + ' : ' − ';
         const questionStr = a + operator + b + ' = ?';
 
+        // 备选答案范围: 0 ~ maxOperand*2 (覆盖加法可能的最大值)
+        const optMax = maxOperand * 2;
         let options = new Set();
         options.add(answer);
         while (options.size < 3) {
             const fake = answer + randomInt(-3, 3);
-            if (fake >= 0 && fake <= max && fake !== answer) {
+            if (fake >= 0 && fake <= optMax && fake !== answer) {
                 options.add(fake);
             }
         }
