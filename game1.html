@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>けいさん チャレンジ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== 顶部装饰 ===== */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1.2vh;
+            min-height: 6px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            z-index: 2;
+        }
+
+        /* ===== 开始界面 ===== */
+        #startScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 6vh 8vw;
+        }
+
+        .title-icon {
+            font-size: 14vh;
+            line-height: 1.2;
+            margin-bottom: 1.5vh;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2vh); }
+        }
+
+        .game-title {
+            font-size: 7vh;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 1.2vh;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .sub-title {
+            font-size: 2.8vh;
+            color: #888;
+            margin-bottom: 5vh;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5vh;
+            width: 100%;
+            align-items: center;
+        }
+
+        .btn-start {
+            font-size: 4.5vh;
+            font-weight: bold;
+            padding: 2.2vh 0;
+            border: none;
+            border-radius: 100px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            letter-spacing: 4px;
+            width: 70vw;
+            max-width: 400px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-start:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-start.btn10 {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 1.5vh 4vh rgba(238, 90, 36, 0.4);
+        }
+
+        .btn-start.btn10:hover {
+            box-shadow: 0 2vh 5vh rgba(238, 90, 36, 0.5);
+        }
+
+        .btn-start.btn20 {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 1.5vh 4vh rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-start.btn20:hover {
+            box-shadow: 0 2vh 5vh rgba(108, 92, 231, 0.5);
+        }
+
+        /* ===== 游戏界面 ===== */
+        #gameScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            padding: 2.5vh 6vw 3vh;
+        }
+
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2vh;
+            font-size: 2.6vh;
+            font-weight: bold;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .top-bar .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6vw;
+        }
+
+        .top-bar .stat-item .icon {
+            font-size: 3vh;
+        }
+
+        .question-area {
+            width: 100%;
+            flex: 1;
+            background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+            border-radius: 4vh;
+            padding: 2vh 4vw;
+            margin-bottom: 2vh;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        .question-text {
+            font-size: 10vh;
+            font-weight: bold;
+            color: #2d3436;
+            letter-spacing: 1vw;
+            line-height: 1.2;
+        }
+
+        .answer-options {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 4vw;
+            margin: 1.5vh 0;
+            flex-shrink: 0;
+        }
+
+        .option-btn {
+            width: 18vw;
+            height: 18vw;
+            max-width: 150px;
+            max-height: 150px;
+            border: 0.6vw solid #dfe6e9;
+            border-radius: 50%;
+            background: #fff;
+            font-size: 7vw;
+            font-weight: bold;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            box-shadow: 0 1vh 2.5vh rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-btn:hover {
+            border-color: #74b9ff;
+            transform: translateY(-0.5vh);
+            box-shadow: 0 1.5vh 3.5vh rgba(116, 185, 255, 0.4);
+        }
+
+        .option-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .option-btn.wrong {
+            border-color: #ff6b6b;
+            background: #ffeaa7;
+            animation: shake 0.5s;
+        }
+
+        .option-btn.correct-flash {
+            border-color: #00b894;
+            background: #dfe6e9;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5%); }
+            40% { transform: translateX(5%); }
+            60% { transform: translateX(-3%); }
+            80% { transform: translateX(3%); }
+        }
+
+        .feedback-area {
+            height: 6vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7vh;
+            flex-shrink: 0;
+        }
+
+        .feedback-x {
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: popIn 0.4s;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 1.5vh;
+            min-height: 10px;
+            background: #dfe6e9;
+            border-radius: 10px;
+            margin-top: auto;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        /* ===== 结束界面 ===== */
+        #endScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 6vh 8vw;
+        }
+
+        .end-icon {
+            font-size: 14vh;
+            line-height: 1.2;
+            margin-bottom: 1.5vh;
+            animation: bounce 2s infinite;
+        }
+
+        .end-title {
+            font-size: 6vh;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 1vh;
+        }
+
+        .end-subtitle {
+            font-size: 3vh;
+            color: #888;
+            margin-bottom: 4vh;
+        }
+
+        .stats-card {
+            background: #f8f9fa;
+            border-radius: 3vh;
+            padding: 3.5vh 6vw;
+            width: 80vw;
+            max-width: 380px;
+            margin-bottom: 4vh;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.8vh 0;
+            font-size: 3vh;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            color: #888;
+        }
+
+        .stats-value {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .stats-value.time {
+            color: #6c5ce7;
+        }
+
+        .stats-value.errors {
+            color: #e17055;
+        }
+
+        .btn-restart {
+            font-size: 3.5vh;
+            font-weight: bold;
+            padding: 2vh 12vw;
+            border: none;
+            border-radius: 100px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 1.5vh 4vh rgba(108, 92, 231, 0.4);
+            font-family: inherit;
+            letter-spacing: 3px;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 2vh 5vh rgba(108, 92, 231, 0.5);
+        }
+
+        .btn-restart:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* ===== 横屏检测：强制竖屏提示 ===== */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container::after {
+                content: 'たて もち で あそんでね 📱';
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #fff;
+                font-size: 5vw;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+                font-family: inherit;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ========== 开始界面 ========== -->
+    <div id="startScreen">
+        <div class="title-icon">🧮</div>
+        <div class="game-title">けいさん チャレンジ</div>
+        <div class="sub-title">あらんだむ もんだい を 20 もん こたえよう！</div>
+        <div class="btn-group">
+            <button class="btn-start btn10" onclick="startGame(10)">10 いない</button>
+            <button class="btn-start btn20" onclick="startGame(20)">20 いない</button>
+        </div>
+    </div>
+
+    <!-- ========== 游戏界面 ========== -->
+    <div id="gameScreen">
+        <!-- 顶部信息栏 -->
+        <div class="top-bar">
+            <div class="stat-item">
+                <span class="icon">⏱️</span>
+                <span id="timerDisplay">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="icon">✅</span>
+                <span id="correctCount">0</span> / 20
+            </div>
+            <div class="stat-item">
+                <span class="icon">❌</span>
+                <span id="wrongCount">0</span>
+            </div>
+        </div>
+
+        <!-- 题目区域 -->
+        <div class="question-area">
+            <div class="question-text" id="questionText">3 + 5</div>
+        </div>
+
+        <!-- 选项按钮 -->
+        <div class="answer-options">
+            <button class="option-btn" id="optA" onclick="checkAnswer(0)">8</button>
+            <button class="option-btn" id="optB" onclick="checkAnswer(1)">8</button>
+            <button class="option-btn" id="optC" onclick="checkAnswer(2)">8</button>
+        </div>
+
+        <!-- 反馈区域 -->
+        <div class="feedback-area" id="feedbackArea"></div>
+
+        <!-- 进度条 -->
+        <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- ========== 结束界面 ========== -->
+    <div id="endScreen">
+        <div class="end-icon">🎉</div>
+        <div class="end-title">かんりょう！</div>
+        <div class="end-subtitle" id="endSubtitle">10 いない</div>
+        <div class="stats-card">
+            <div class="stats-row">
+                <span class="stats-label">⏱️ じかん</span>
+                <span class="stats-value time" id="finalTime">00:00</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">❌ まちがえ</span>
+                <span class="stats-value errors" id="finalErrors">0</span>
+            </div>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">もう いちど</button>
+    </div>
+</div>
+
+<script>
+    // ========== 游戏状态 ==========
+    let correctCount = 0;
+    let wrongCount = 0;
+    let currentAnswer = 0;
+    let timerInterval = null;
+    let startTime = null;
+    let isAnswering = false;
+    let questionCount = 20;
+    let gameMax = 10;
+
+    const $ = id => document.getElementById(id);
+    const feedbackArea = $('feedbackArea');
+
+    // ========== 工具函数 ==========
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function formatTime(seconds) {
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return m + ':' + s;
+    }
+
+    // ========== 生成题目 ==========
+    function generateQuestion(max) {
+        const isAdd = Math.random() < 0.5;
+
+        let a, b, answer;
+
+        if (isAdd) {
+            a = randomInt(1, max - 1);
+            b = randomInt(1, max - a);
+            answer = a + b;
+        } else {
+            a = randomInt(2, max);
+            b = randomInt(1, a);
+            answer = a - b;
+        }
+
+        const operator = isAdd ? ' + ' : ' − ';
+        const questionStr = a + operator + b + ' = ?';
+
+        let options = new Set();
+        options.add(answer);
+        while (options.size < 3) {
+            const fake = answer + randomInt(-3, 3);
+            if (fake >= 0 && fake <= max && fake !== answer) {
+                options.add(fake);
+            }
+        }
+
+        const optArr = Array.from(options);
+        for (let i = optArr.length - 1; i > 0; i--) {
+            const j = randomInt(0, i);
+            [optArr[i], optArr[j]] = [optArr[j], optArr[i]];
+        }
+
+        return { questionStr, answer, options: optArr };
+    }
+
+    // ========== 显示题目 ==========
+    function showQuestion() {
+        const q = generateQuestion(gameMax);
+        currentAnswer = q.answer;
+
+        $('questionText').textContent = q.questionStr;
+        $('optA').textContent = q.options[0];
+        $('optB').textContent = q.options[1];
+        $('optC').textContent = q.options[2];
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('wrong', 'correct-flash');
+            btn.disabled = false;
+        });
+
+        isAnswering = false;
+    }
+
+    // ========== 检查答案 ==========
+    function checkAnswer(index) {
+        if (isAnswering) return;
+        isAnswering = true;
+
+        const btns = document.querySelectorAll('.option-btn');
+        const clickedBtn = btns[index];
+        const selected = parseInt(clickedBtn.textContent, 10);
+
+        if (selected === currentAnswer) {
+            correctCount++;
+            $('correctCount').textContent = correctCount;
+            updateProgress();
+
+            if (correctCount >= questionCount) {
+                endGame();
+                return;
+            }
+
+            showQuestion();
+        } else {
+            wrongCount++;
+            $('wrongCount').textContent = wrongCount;
+            feedbackArea.innerHTML = '<span class="feedback-x">✘</span>';
+            clickedBtn.classList.add('wrong');
+
+            setTimeout(() => {
+                feedbackArea.innerHTML = '';
+                showQuestion();
+            }, 600);
+        }
+    }
+
+    // ========== 进度条 ==========
+    function updateProgress() {
+        const pct = (correctCount / questionCount) * 100;
+        $('progressBar').style.width = pct + '%';
+    }
+
+    // ========== 计时器 ==========
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            $('timerDisplay').textContent = formatTime(elapsed);
+        }, 200);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    function getElapsedSeconds() {
+        return Math.floor((Date.now() - startTime) / 1000);
+    }
+
+    // ========== 开始游戏 ==========
+    function startGame(max) {
+        gameMax = max;
+
+        correctCount = 0;
+        wrongCount = 0;
+        isAnswering = false;
+        $('correctCount').textContent = '0';
+        $('wrongCount').textContent = '0';
+        $('timerDisplay').textContent = '00:00';
+        $('progressBar').style.width = '0%';
+        feedbackArea.innerHTML = '';
+
+        $('startScreen').style.display = 'none';
+        $('gameScreen').style.display = 'flex';
+        $('endScreen').style.display = 'none';
+
+        showQuestion();
+        startTimer();
+    }
+
+    // ========== 游戏结束 ==========
+    function endGame() {
+        stopTimer();
+
+        const elapsed = getElapsedSeconds();
+        $('finalTime').textContent = formatTime(elapsed);
+        $('finalErrors').textContent = wrongCount;
+        $('endSubtitle').textContent = gameMax + ' いない';
+
+        $('gameScreen').style.display = 'none';
+        $('endScreen').style.display = 'flex';
+    }
+
+    // ========== 重新开始 ==========
+    function restartGame() {
+        $('endScreen').style.display = 'none';
+        $('startScreen').style.display = 'flex';
+    }
+</script>
+
+</body>
+</html>
