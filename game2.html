@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>すうじ よみかた チャレンジ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Hiragino Maru Gothic ProN', 'Yu Gothic UI', 'Meiryo', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== 顶部装饰 ===== */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1.2vh;
+            min-height: 6px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            z-index: 2;
+        }
+
+        /* ===== 开始界面 ===== */
+        #startScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 5vh 7vw;
+        }
+
+        .title-icon {
+            font-size: 12vh;
+            line-height: 1.1;
+            margin-bottom: 1vh;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2vh); }
+        }
+
+        .game-title {
+            font-size: 5.8vh;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 1.2vh;
+            text-align: center;
+            line-height: 1.25;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .sub-title {
+            font-size: 2.4vh;
+            color: #888;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 3.2vh;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2vh 3vw;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .mode-btn {
+            border: none;
+            border-radius: 3vh;
+            padding: 1.9vh 1vw 1.7vh;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4vh;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+        }
+
+        .mode-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .mode-icon {
+            font-size: 4.6vh;
+            line-height: 1.1;
+        }
+
+        .mode-name {
+            font-size: 2.7vh;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .mode-sub {
+            font-size: 1.75vh;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-basic {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 1.2vh 3vh rgba(238, 90, 36, 0.4);
+        }
+
+        .mode-koyomi {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 1.2vh 3vh rgba(108, 92, 231, 0.4);
+        }
+
+        .mode-counter {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            box-shadow: 0 1.2vh 3vh rgba(0, 184, 148, 0.4);
+        }
+
+        .mode-all {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            box-shadow: 0 1.2vh 3vh rgba(232, 67, 147, 0.4);
+        }
+        /* ===== 读音一览：开始页入口（与游戏按钮区分：白底描边） ===== */
+        .browse-entry-wrap {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 2.8vh;
+            padding-top: 2.4vh;
+            border-top: 2px dashed #dfe6e9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.7vh;
+        }
+
+        .browse-entry {
+            width: 100%;
+            border: 0.45vh solid #b2bec3;
+            border-radius: 100px;
+            background: #fff;
+            color: #2d3436;
+            font-family: inherit;
+            font-size: 2.9vh;
+            font-weight: bold;
+            padding: 1.5vh 0;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.6vw;
+            letter-spacing: 1px;
+        }
+
+        .browse-entry:hover {
+            border-color: #6c5ce7;
+            color: #6c5ce7;
+            transform: translateY(-2px);
+        }
+
+        .browse-entry:active {
+            transform: scale(0.98);
+        }
+
+        .browse-entry .entry-icon {
+            font-size: 3.4vh;
+            line-height: 1;
+        }
+
+        .browse-note {
+            font-size: 1.9vh;
+            color: #b2bec3;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== 读音一览：整页 ===== */
+        #listScreen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            background: #fdfcf8;
+        }
+
+        .list-top {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2vw;
+            padding: 2.2vh 5vw 1.2vh;
+            flex-shrink: 0;
+        }
+
+        .list-back {
+            border: none;
+            background: #fff;
+            border-radius: 100px;
+            padding: 0.8vh 3.4vw;
+            font-family: inherit;
+            font-size: 2.3vh;
+            font-weight: bold;
+            color: #6c5ce7;
+            cursor: pointer;
+            box-shadow: 0 0.6vh 1.6vh rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .list-back:active {
+            transform: scale(0.96);
+        }
+
+        .list-title {
+            font-size: 2.5vh;
+            font-weight: bold;
+            color: #2d3436;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 1px;
+        }
+
+        .tab-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1vh 2vw;
+            padding: 0 5vw 1.4vh;
+            flex-shrink: 0;
+        }
+
+        .tab-chip {
+            border: 0.35vh solid #dfe6e9;
+            background: #fff;
+            color: #636e72;
+            border-radius: 100px;
+            padding: 0.6vh 2.8vw;
+            font-family: inherit;
+            font-size: 2.1vh;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+            white-space: nowrap;
+        }
+
+        .tab-chip .tab-count {
+            font-size: 1.55vh;
+            opacity: 0.65;
+        }
+
+        .tab-chip.active {
+            background: #6c5ce7;
+            border-color: #6c5ce7;
+            color: #fff;
+        }
+
+        .tab-chip.active .tab-count {
+            opacity: 0.85;
+        }
+
+        /* ===== 读音一览：滚动区与卡片 ===== */
+        .list-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding: 0 5vw 4vh;
+        }
+
+        .group-title {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #fdfcf8;
+            font-size: 2.15vh;
+            font-weight: bold;
+            color: #6c5ce7;
+            padding: 1.3vh 0 0.9vh;
+            letter-spacing: 1px;
+        }
+
+        .read-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.3vh 3vw;
+        }
+
+        .read-card {
+            border: 0.3vh solid #e9ecef;
+            border-left: 0.8vh solid #b2bec3;
+            border-radius: 1.8vh;
+            background: #fff;
+            padding: 1.1vh 2.2vw;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3vh;
+            transition: transform 0.15s, background 0.15s, border-color 0.15s;
+            min-height: 0;
+        }
+
+        .read-card:hover {
+            border-color: #74b9ff;
+        }
+
+        .read-card:active,
+        .read-card.tapped {
+            transform: scale(0.97);
+            background: #f1f2f6;
+        }
+
+        .read-text {
+            font-size: 3.1vh;
+            font-weight: bold;
+            color: #2d3436;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .read-kana {
+            font-size: 2.15vh;
+            font-weight: bold;
+            color: #0984e3;
+            line-height: 1.35;
+            word-break: break-all;
+        }
+
+        .read-speaker {
+            font-size: 1.7vh;
+            opacity: 0.4;
+            margin-left: 1vw;
+        }
+
+        .read-alt {
+            font-size: 1.65vh;
+            color: #b2bec3;
+            line-height: 1.35;
+            word-break: break-all;
+        }
+
+        .no-tts .read-speaker {
+            display: none;
+        }
+
+        /* 分类强调色（左色条） */
+        #listScreen[data-tab="basic"] .read-card { border-left-color: #ff6b6b; }
+        #listScreen[data-tab="native"] .read-card { border-left-color: #feca57; }
+        #listScreen[data-tab="date"] .read-card { border-left-color: #6c5ce7; }
+        #listScreen[data-tab="month"] .read-card { border-left-color: #00b894; }
+        #listScreen[data-tab="clock"] .read-card { border-left-color: #0984e3; }
+        #listScreen[data-tab="counter"] .read-card { border-left-color: #fd79a8; }
+
+        /* ===== 游戏界面 ===== */
+        #gameScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            padding: 2.6vh 6vw 2.4vh;
+        }
+
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8vh;
+            font-size: 2.5vh;
+            font-weight: bold;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .top-bar .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6vw;
+        }
+
+        .top-bar .stat-item .icon {
+            font-size: 2.9vh;
+        }
+
+        .top-bar .mode-label {
+            color: #6c5ce7;
+            font-size: 2.4vh;
+            letter-spacing: 1px;
+        }
+
+        .sound-btn {
+            border: none;
+            background: #f1f2f6;
+            border-radius: 100px;
+            padding: 0.6vh 2.6vw;
+            font-size: 2.4vh;
+            line-height: 1.2;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .sound-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* 题目区 */
+        .question-area {
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+            border-radius: 4vh;
+            padding: 2.4vh 3vw;
+            margin-bottom: 1.8vh;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2vh;
+        }
+
+        .question-ctx {
+            font-size: 2.5vh;
+            font-weight: bold;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.6vw;
+            line-height: 1.3;
+            min-height: 3.4vh;
+        }
+
+        .question-ctx .ctx-emoji {
+            font-size: 3.4vh;
+            line-height: 1;
+        }
+
+        .question-ctx .replay-btn {
+            border: none;
+            background: #fff;
+            border-radius: 100px;
+            padding: 0.4vh 2.4vw;
+            font-size: 2.4vh;
+            line-height: 1.2;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 0.5vh 1.4vh rgba(0, 0, 0, 0.12);
+        }
+
+        .question-text {
+            font-size: 14vh;
+            font-weight: bold;
+            color: #2d3436;
+            line-height: 1.12;
+            letter-spacing: 0.4vw;
+            white-space: nowrap;
+        }
+
+        /* 选项 */
+        .answer-options {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            flex-shrink: 0;
+        }
+
+        .option-btn {
+            width: 100%;
+            min-height: 8.2vh;
+            border: 0.5vh solid #dfe6e9;
+            border-radius: 100px;
+            background: #fff;
+            font-size: min(4.3vh, 6vw);
+            font-weight: bold;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            box-shadow: 0 0.9vh 2.2vh rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8vh 3vw;
+            white-space: nowrap;
+            letter-spacing: 0.3vw;
+        }
+
+        .option-btn:hover {
+            border-color: #74b9ff;
+        }
+
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+
+        .option-btn.wrong {
+            border-color: #ff6b6b;
+            background: #ffeaa7;
+            animation: shake 0.5s;
+        }
+
+        .option-btn.correct-flash {
+            border-color: #00b894;
+            background: #d1f2eb;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4%); }
+            40% { transform: translateX(4%); }
+            60% { transform: translateX(-2.5%); }
+            80% { transform: translateX(2.5%); }
+        }
+
+        /* 反馈 */
+        .feedback-area {
+            height: 5.6vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2.2vw;
+            font-size: 4.6vh;
+            flex-shrink: 0;
+        }
+
+        .feedback-x {
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: popIn 0.4s;
+        }
+
+        .feedback-o {
+            color: #00b894;
+            font-weight: bold;
+            animation: popIn 0.4s;
+        }
+
+        .feedback-answer {
+            font-size: 2.4vh;
+            font-weight: bold;
+            color: #636e72;
+            white-space: nowrap;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 进度条 */
+        .progress-bar-wrap {
+            width: 100%;
+            height: 1.5vh;
+            min-height: 10px;
+            background: #dfe6e9;
+            border-radius: 10px;
+            margin-top: auto;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        /* ===== 结束界面 ===== */
+        #endScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 5vh 8vw;
+        }
+
+        .end-icon {
+            font-size: 13vh;
+            line-height: 1.2;
+            margin-bottom: 1vh;
+            animation: bounce 2s infinite;
+        }
+
+        .end-title {
+            font-size: 5.6vh;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 1vh;
+        }
+
+        .end-subtitle {
+            font-size: 2.9vh;
+            color: #888;
+            margin-bottom: 3.4vh;
+        }
+
+        .stats-card {
+            background: #f8f9fa;
+            border-radius: 3vh;
+            padding: 3vh 6vw;
+            width: 80vw;
+            max-width: 380px;
+            margin-bottom: 3.4vh;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.7vh 0;
+            font-size: 2.9vh;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            color: #888;
+        }
+
+        .stats-value {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .stats-value.time {
+            color: #6c5ce7;
+        }
+
+        .stats-value.errors {
+            color: #e17055;
+        }
+
+        .btn-restart {
+            font-size: 3.4vh;
+            font-weight: bold;
+            padding: 1.9vh 12vw;
+            border: none;
+            border-radius: 100px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 1.5vh 4vh rgba(108, 92, 231, 0.4);
+            font-family: inherit;
+            letter-spacing: 3px;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-restart:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-home {
+            margin-top: 2.2vh;
+            font-size: 2.4vh;
+            color: #b2bec3;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 横屏检测：强制竖屏提示 ===== */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container::after {
+                content: 'たて もち で あそんでね 📱';
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #fff;
+                font-size: 5vw;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+                font-family: inherit;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- ========== 开始界面 ========== -->
+    <div id="startScreen">
+        <div class="title-icon">🗣️</div>
+        <div class="game-title">すうじ よみかた</div>
+        <div class="sub-title">20もん ちょうせん！<br>ただしい よみかたを えらんでね</div>
+        <div class="mode-grid">
+            <button class="mode-btn mode-basic" onclick="startGame('basic')">
+                <span class="mode-icon">🔢</span>
+                <span class="mode-name">きほん</span>
+                <span class="mode-sub">0〜10・つ</span>
+            </button>
+            <button class="mode-btn mode-koyomi" onclick="startGame('koyomi')">
+                <span class="mode-icon">🗓️</span>
+                <span class="mode-name">こよみ</span>
+                <span class="mode-sub">ひ・つき・じかん</span>
+            </button>
+            <button class="mode-btn mode-counter" onclick="startGame('counter')">
+                <span class="mode-icon">🐟</span>
+                <span class="mode-name">かぞえかた</span>
+                <span class="mode-sub">個・匹・本…</span>
+            </button>
+            <button class="mode-btn mode-all" onclick="startGame('all')">
+                <span class="mode-icon">🎲</span>
+                <span class="mode-name">ぜんぶ</span>
+                <span class="mode-sub">ミックス</span>
+            </button>
+        </div>
+
+        <!-- 读音一览入口：白底描边，与上面的游戏按钮区分 -->
+        <div class="browse-entry-wrap">
+            <button class="browse-entry" onclick="openList()">
+                <span class="entry-icon">📖</span>
+                <span>よみかたを みる</span>
+            </button>
+            <div class="browse-note">ぜんぶの よみかたを おぼえよう</div>
+        </div>
+    </div>
+
+    <!-- ========== 游戏界面 ========== -->
+    <div id="gameScreen">
+        <div class="top-bar">
+            <div class="stat-item mode-label" id="modeLabel">きほん</div>
+            <div class="stat-item">
+                <span class="icon">✅</span>
+                <span id="correctCount">0</span>&nbsp;/&nbsp;<span id="totalCount">20</span>
+            </div>
+            <button class="sound-btn" id="soundBtn" onclick="toggleSound()" aria-label="おとの おんおふ">🔊</button>
+        </div>
+
+        <div class="question-area">
+            <div class="question-ctx" id="questionCtx"></div>
+            <div class="question-text" id="questionText">3匹</div>
+        </div>
+
+        <div class="answer-options" id="answerOptions">
+            <button class="option-btn" data-index="0" onclick="checkAnswer(0)"></button>
+            <button class="option-btn" data-index="1" onclick="checkAnswer(1)"></button>
+            <button class="option-btn" data-index="2" onclick="checkAnswer(2)"></button>
+        </div>
+
+        <div class="feedback-area" id="feedbackArea"></div>
+
+        <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- ========== 结束界面 ========== -->
+    <div id="endScreen">
+        <div class="end-icon">🎉</div>
+        <div class="end-title">かんりょう！</div>
+        <div class="end-subtitle" id="endSubtitle">きほん</div>
+        <div class="stats-card">
+            <div class="stats-row">
+                <span class="stats-label">⏱️ じかん</span>
+                <span class="stats-value time" id="finalTime">00:00</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">❌ まちがえ</span>
+                <span class="stats-value errors" id="finalErrors">0</span>
+            </div>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">もう いちど</button>
+        <a class="btn-home" href="index.html">🏠 ホームへ</a>
+    </div>
+
+    <!-- ========== 读音一览（只读，不计分） ========== -->
+    <div id="listScreen" data-tab="basic">
+        <div class="list-top">
+            <button class="list-back" onclick="closeList()">← もどる</button>
+            <div class="list-title">よみかた いちらん</div>
+            <button class="sound-btn" id="listSoundBtn" onclick="toggleSound()" aria-label="おとの おんおふ">🔊</button>
+        </div>
+        <div class="tab-row" id="tabRow"></div>
+        <div class="list-scroll" id="listScroll"></div>
+    </div>
+</div>
+
+<script>
+    /* ==================================================================
+       日文数字读音数据表
+       ------------------------------------------------------------------
+       每条记录格式: [题面, 正解, 其他也正确的读法, 语境emoji, 语境提示, 是否出题]
+       - 第 3 项 alts 里的读法同样正确，永远不会被当成错误选项（防止歧义）
+       - 第 6 项写 false 表示只收录、不出题
+       ================================================================== */
+    /* ==== CORE-START (以下为纯数据与纯逻辑，可单独抽出做校验) ==== */
+
+    /* ---------- 1. 基本数字 0〜10 ---------- */
+    const BASIC_ROWS = [
+        ['0',  'ゼロ',   ['れい'], '🔢', 'すうじ', false],
+        ['1',  'いち',   [],       '🔢', 'すうじ'],
+        ['2',  'に',     [],       '🔢', 'すうじ'],
+        ['3',  'さん',   [],       '🔢', 'すうじ'],
+        ['4',  'よん',   ['し'],   '🔢', 'すうじ'],
+        ['5',  'ご',     [],       '🔢', 'すうじ'],
+        ['6',  'ろく',   [],       '🔢', 'すうじ'],
+        ['7',  'なな',   ['しち'], '🔢', 'すうじ'],
+        ['8',  'はち',   [],       '🔢', 'すうじ'],
+        ['9',  'きゅう', ['く'],   '🔢', 'すうじ'],
+        ['10', 'じゅう', [],       '🔢', 'すうじ']
+    ];
+
+    /* ---------- 2. 和语数词 1つ〜10 ---------- */
+    const NATIVE_ROWS = [
+        ['1つ',  'ひとつ',   [], '🍡', '1から 10まで'],
+        ['2つ',  'ふたつ',   [], '🍡', '1から 10まで'],
+        ['3つ',  'みっつ',   [], '🍡', '1から 10まで'],
+        ['4つ',  'よっつ',   [], '🍡', '1から 10まで'],
+        ['5つ',  'いつつ',   [], '🍡', '1から 10まで'],
+        ['6つ',  'むっつ',   [], '🍡', '1から 10まで'],
+        ['7つ',  'ななつ',   [], '🍡', '1から 10まで'],
+        ['8つ',  'やっつ',   [], '🍡', '1から 10まで'],
+        ['9つ',  'ここのつ', [], '🍡', '1から 10まで'],
+        ['10つ', 'とお',     [], '🍡', '1から 10まで']
+    ];
+
+    /* ---------- 3. 日期 1日〜31日 ---------- */
+    const DATE_ROWS = [
+        ['1日',  'ついたち',       ['いちにち'], '📅', 'カレンダーの ひ'],
+        ['2日',  'ふつか',         [],           '📅', 'カレンダーの ひ'],
+        ['3日',  'みっか',         [],           '📅', 'カレンダーの ひ'],
+        ['4日',  'よっか',         [],           '📅', 'カレンダーの ひ'],
+        ['5日',  'いつか',         [],           '📅', 'カレンダーの ひ'],
+        ['6日',  'むいか',         [],           '📅', 'カレンダーの ひ'],
+        ['7日',  'なのか',         [],           '📅', 'カレンダーの ひ'],
+        ['8日',  'ようか',         [],           '📅', 'カレンダーの ひ'],
+        ['9日',  'ここのか',       [],           '📅', 'カレンダーの ひ'],
+        ['10日', 'とおか',         [],           '📅', 'カレンダーの ひ'],
+        ['11日', 'じゅういちにち', [],           '📅', 'カレンダーの ひ'],
+        ['12日', 'じゅうににち',   [],           '📅', 'カレンダーの ひ'],
+        ['13日', 'じゅうさんにち', [],           '📅', 'カレンダーの ひ'],
+        ['14日', 'じゅうよっか',   [],           '📅', 'カレンダーの ひ'],
+        ['15日', 'じゅうごにち',   [],           '📅', 'カレンダーの ひ'],
+        ['16日', 'じゅうろくにち', [],           '📅', 'カレンダーの ひ'],
+        ['17日', 'じゅうしちにち', [],           '📅', 'カレンダーの ひ'],
+        ['18日', 'じゅうはちにち', [],           '📅', 'カレンダーの ひ'],
+        ['19日', 'じゅうくにち',   [],           '📅', 'カレンダーの ひ'],
+        ['20日', 'はつか',         [],           '📅', 'カレンダーの ひ'],
+        ['21日', 'にじゅういちにち', [],         '📅', 'カレンダーの ひ'],
+        ['22日', 'にじゅうににち', [],           '📅', 'カレンダーの ひ'],
+        ['23日', 'にじゅうさんにち', [],         '📅', 'カレンダーの ひ'],
+        ['24日', 'にじゅうよっか', [],           '📅', 'カレンダーの ひ'],
+        ['25日', 'にじゅうごにち', [],           '📅', 'カレンダーの ひ'],
+        ['26日', 'にじゅうろくにち', [],         '📅', 'カレンダーの ひ'],
+        ['27日', 'にじゅうしちにち', [],         '📅', 'カレンダーの ひ'],
+        ['28日', 'にじゅうはちにち', [],         '📅', 'カレンダーの ひ'],
+        ['29日', 'にじゅうくにち', [],           '📅', 'カレンダーの ひ'],
+        ['30日', 'さんじゅうにち', [],           '📅', 'カレンダーの ひ'],
+        ['31日', 'さんじゅういちにち', [],       '📅', 'カレンダーの ひ']
+    ];
+    /* ---------- 4. 月份 1月〜12月 ---------- */
+    const MONTH_ROWS = [
+        ['1月',  'いちがつ',     [], '🗓️', 'つき'],
+        ['2月',  'にがつ',       [], '🗓️', 'つき'],
+        ['3月',  'さんがつ',     [], '🗓️', 'つき'],
+        ['4月',  'しがつ',       [], '🗓️', 'つき'],
+        ['5月',  'ごがつ',       [], '🗓️', 'つき'],
+        ['6月',  'ろくがつ',     [], '🗓️', 'つき'],
+        ['7月',  'しちがつ',     [], '🗓️', 'つき'],
+        ['8月',  'はちがつ',     [], '🗓️', 'つき'],
+        ['9月',  'くがつ',       [], '🗓️', 'つき'],
+        ['10月', 'じゅうがつ',   [], '🗓️', 'つき'],
+        ['11月', 'じゅういちがつ', [], '🗓️', 'つき'],
+        ['12月', 'じゅうにがつ', [], '🗓️', 'つき']
+    ];
+
+    /* ---------- 5. 时刻 1時〜12時 ---------- */
+    const HOUR_ROWS = [
+        ['1時',  'いちじ',     [], '🕐', 'とけい'],
+        ['2時',  'にじ',       [], '🕐', 'とけい'],
+        ['3時',  'さんじ',     [], '🕐', 'とけい'],
+        ['4時',  'よじ',       [], '🕐', 'とけい'],
+        ['5時',  'ごじ',       [], '🕐', 'とけい'],
+        ['6時',  'ろくじ',     [], '🕐', 'とけい'],
+        ['7時',  'しちじ',     [], '🕐', 'とけい'],
+        ['8時',  'はちじ',     [], '🕐', 'とけい'],
+        ['9時',  'くじ',       [], '🕐', 'とけい'],
+        ['10時', 'じゅうじ',   [], '🕐', 'とけい'],
+        ['11時', 'じゅういちじ', [], '🕐', 'とけい'],
+        ['12時', 'じゅうにじ', [], '🕐', 'とけい']
+    ];
+
+    /* ---------- 6. 分钟 1分〜10分 ---------- */
+    const MINUTE_ROWS = [
+        ['1分',  'いっぷん',   [], '⏱️', 'ふん'],
+        ['2分',  'にふん',     [], '⏱️', 'ふん'],
+        ['3分',  'さんぷん',   [], '⏱️', 'ふん'],
+        ['4分',  'よんぷん',   [], '⏱️', 'ふん'],
+        ['5分',  'ごふん',     [], '⏱️', 'ふん'],
+        ['6分',  'ろっぷん',   [], '⏱️', 'ふん'],
+        ['7分',  'ななふん',   ['しちふん'], '⏱️', 'ふん'],
+        ['8分',  'はっぷん',   [], '⏱️', 'ふん'],
+        ['9分',  'きゅうふん', [], '⏱️', 'ふん'],
+        ['10分', 'じゅっぷん', ['じっぷん'], '⏱️', 'ふん']
+    ];
+
+    /* ---------- 7. 助数词（N匹 / N個 等） ----------
+       readings: 1〜10 的读音，用空格分隔
+       alts:     同一个数字的另一种正确读法，按数字索引（不会当错误选项） */
+    const COUNTER_UNITS = [
+        { unit: '個', emoji: '🍎', ctx: 'ものを かぞえる', readings: 'いっこ にこ さんこ よんこ ごこ ろっこ ななこ はっこ きゅうこ じゅっこ', alts: { 10: ['じっこ'] } },
+        { unit: '匹', emoji: '🐟', ctx: 'どうぶつを かぞえる', readings: 'いっぴき にひき さんびき よんひき ごひき ろっぴき ななひき はっぴき きゅうひき じゅっぴき', alts: { 10: ['じっぴき'] } },
+        { unit: '本', emoji: '✏️', ctx: 'ほそながい ものを かぞえる', readings: 'いっぽん にほん さんぼん よんほん ごほん ろっぽん ななほん はっぽん きゅうほん じゅっぽん', alts: { 10: ['じっぽん'] } },
+        { unit: '枚', emoji: '📄', ctx: 'うすい ものを かぞえる', readings: 'いちまい にまい さんまい よんまい ごまい ろくまい ななまい はちまい きゅうまい じゅうまい', alts: {} },
+        { unit: '台', emoji: '🚗', ctx: 'くるまを かぞえる', readings: 'いちだい にだい さんだい よんだい ごだい ろくだい ななだい はちだい きゅうだい じゅうだい', alts: {} },
+        { unit: '杯', emoji: '🥤', ctx: 'のみものを かぞえる', readings: 'いっぱい にはい さんばい よんはい ごはい ろっぱい ななはい はっぱい きゅうはい じゅっぱい', alts: { 10: ['じっぱい'] } },
+        { unit: '冊', emoji: '📚', ctx: 'ほんを かぞえる', readings: 'いっさつ にさつ さんさつ よんさつ ごさつ ろくさつ ななさつ はっさつ きゅうさつ じゅっさつ', alts: { 10: ['じっさつ'] } },
+        { unit: '回', emoji: '🔁', ctx: 'なんかい', readings: 'いっかい にかい さんかい よんかい ごかい ろっかい ななかい はっかい きゅうかい じゅっかい', alts: { 10: ['じっかい'] } },
+        { unit: '歳', emoji: '🎂', ctx: 'とし', readings: 'いっさい にさい さんさい よんさい ごさい ろくさい ななさい はっさい きゅうさい じゅっさい', alts: { 7: ['しちさい'], 10: ['じっさい'] } },
+        { unit: '円', emoji: '💴', ctx: 'おかね', readings: 'いちえん にえん さんえん よえん ごえん ろくえん ななえん はちえん きゅうえん じゅうえん', alts: {} },
+        { unit: '階', emoji: '🏢', ctx: 'かいだん', readings: 'いっかい にかい さんがい よんかい ごかい ろっかい ななかい はっかい きゅうかい じゅっかい', alts: { 3: ['さんかい'], 10: ['じっかい'] } },
+        { unit: '人', emoji: '👦', ctx: 'ひとを かぞえる', readings: 'ひとり ふたり さんにん よにん ごにん ろくにん しちにん はちにん くにん じゅうにん', alts: { 9: ['きゅうにん'] } },
+        { unit: '羽', emoji: '🐦', ctx: 'とりを かぞえる', readings: 'いちわ にわ さんば よんわ ごわ ろくわ ななわ はちわ きゅうわ じゅうわ', alts: {} }
+    ];
+    /* ---------- 8. 展开成统一条目 ---------- */
+    const ENTRIES = [];
+
+    (function buildEntries() {
+        const pushRows = (rows, cat) => {
+            rows.forEach(r => {
+                ENTRIES.push({
+                    id: cat + '-' + ENTRIES.length,
+                    text: r[0],
+                    kana: r[1],
+                    alts: r[2] || [],
+                    emoji: r[3] || '',
+                    ctx: r[4] || '',
+                    cat: cat,
+                    quiz: r[5] !== false,
+                    value: parseInt(r[0], 10)
+                });
+            });
+        };
+
+        pushRows(BASIC_ROWS, 'basic');
+        pushRows(NATIVE_ROWS, 'native');
+        pushRows(DATE_ROWS, 'date');
+        pushRows(MONTH_ROWS, 'month');
+        pushRows(HOUR_ROWS, 'hour');
+        pushRows(MINUTE_ROWS, 'minute');
+
+        COUNTER_UNITS.forEach(u => {
+            u.readings.trim().split(/\s+/).forEach((kana, i) => {
+                const n = i + 1;
+                ENTRIES.push({
+                    id: 'counter-' + u.unit + '-' + n,
+                    text: n + u.unit,
+                    kana: kana,
+                    alts: (u.alts && u.alts[n]) || [],
+                    emoji: u.emoji,
+                    ctx: u.ctx,
+                    cat: 'counter',
+                    quiz: true,
+                    value: n
+                });
+            });
+        });
+
+        // 20歳 特例: はたち（にじゅっさい 也算对）
+        ENTRIES.push({
+            id: 'counter-歳-20', text: '20歳', kana: 'はたち', alts: ['にじゅっさい'],
+            emoji: '🎂', ctx: 'とし', cat: 'counter', quiz: true, value: 20
+        });
+    })();
+
+    /* ---------- 9. 索引 ---------- */
+    const BY_VALUE = new Map();     // 数字 -> 同数字的所有条目
+    const READING_SET = new Map();  // 题面 -> 该题面的所有正确读法（含 alts）
+
+    ENTRIES.forEach(e => {
+        if (!BY_VALUE.has(e.value)) BY_VALUE.set(e.value, []);
+        BY_VALUE.get(e.value).push(e);
+
+        if (!READING_SET.has(e.text)) READING_SET.set(e.text, new Set());
+        const set = READING_SET.get(e.text);
+        set.add(e.kana);
+        e.alts.forEach(a => set.add(a));
+    });
+
+    /* ---------- 10. 模式 ---------- */
+    const MODES = {
+        basic:   { label: 'きほん',     cats: ['basic', 'native'] },
+        koyomi:  { label: 'こよみ',     cats: ['date', 'month', 'hour', 'minute'] },
+        counter: { label: 'かぞえかた', cats: ['counter'] },
+        all:     { label: 'ぜんぶ',     cats: ['basic', 'native', 'date', 'month', 'hour', 'minute', 'counter'] }
+    };
+
+    /* 读音一览的 6 个分类（合起来正好覆盖全部条目） */
+    const LIST_TABS = [
+        { key: 'basic',   label: 'すうじ',   cats: ['basic'] },
+        { key: 'native',  label: 'つ',       cats: ['native'] },
+        { key: 'date',    label: 'ひ',       cats: ['date'] },
+        { key: 'month',   label: 'つき',     cats: ['month'] },
+        { key: 'clock',   label: 'とけい',   cats: ['hour', 'minute'] },
+        { key: 'counter', label: 'かぞえる', cats: ['counter'] }
+    ];
+
+    function entriesForTab(tab) {
+        return ENTRIES.filter(e => tab.cats.indexOf(e.cat) !== -1);
+    }
+
+    const QUESTION_COUNT = 20;
+    let mode = 'basic';
+
+    /* ---------- 11. 工具 ---------- */
+    const KANA_RE = /^[ぁ-ゖー]+$/;
+
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function readSet(text) {
+        return READING_SET.get(text) || new Set();
+    }
+
+    function sameValueEntries(entry) {
+        return (BY_VALUE.get(entry.value) || []).filter(e => e.text !== entry.text);
+    }
+
+    function inCurrentScope(entry) {
+        return MODES[mode].cats.indexOf(entry.cat) !== -1;
+    }
+
+    // 「3匹」→「匹」：用于看读音一览分组、以及反向题的同一单位选项
+    function unitOf(text) {
+        return text.replace(/^[0-9]+/, '');
+    }
+
+    /* ---------- 12. 近似音变形 ---------- */
+    // 只保留会真实产生「连浊 / 半浊」的 か行・さ行・は行（た行会生造 づ/ぢ 这类不自然的形式）
+    const DAKU = {
+        か: 'が', き: 'ぎ', く: 'ぐ', け: 'げ', こ: 'ご',
+        さ: 'ざ', し: 'じ', す: 'ず', せ: 'ぜ', そ: 'ぞ',
+        は: 'ば', ひ: 'び', ふ: 'ぶ', へ: 'べ', ほ: 'ぼ'
+    };
+    const HANDAKU = { は: 'ぱ', ひ: 'ぴ', ふ: 'ぷ', へ: 'ぺ', ほ: 'ぽ' };
+    // 浊音 → 半浊音（さんびき → さんぴき 这类儿童常见错误）
+    const DAKU_TO_HAN = { ば: 'ぱ', び: 'ぴ', ぶ: 'ぷ', べ: 'ぺ', ぼ: 'ぽ' };
+    const SEION = {};
+    const SEION_H = {};
+    Object.keys(DAKU).forEach(k => { SEION[DAKU[k]] = k; });
+    Object.keys(HANDAKU).forEach(k => { SEION_H[HANDAKU[k]] = k; });
+
+    // 促音还原: いっ→いち, ろっ→ろく, はっ→はち, じゅっ→じゅう
+    const SOKUON_EXPAND = { 'い': 'ち', 'ろ': 'く', 'は': 'ち', 'じゅ': 'う' };
+
+    function mutateReading(kana) {
+        const out = [];
+        const seen = new Set();
+        const chars = Array.from(kana);
+        const add = k => {
+            if (k !== kana && !seen.has(k) && KANA_RE.test(k)) {
+                seen.add(k);
+                out.push(k);
+            }
+        };
+
+        // ① 促音还原（最有教学价值）: いっこ → いちこ / ろっぴき → ろくひき
+        const sokuon = chars.indexOf('っ');
+        let sokuonKey = '';
+        if (sokuon > 0) {
+            const prev = chars[sokuon - 1];
+            sokuonKey = (prev === 'ゃ' || prev === 'ゅ' || prev === 'ょ')
+                ? chars.slice(sokuon - 2, sokuon).join('')
+                : prev;
+            const expand = SOKUON_EXPAND[sokuonKey];
+            if (expand) {
+                const head = chars.slice(0, sokuon).join('');
+                const rest = chars.slice(sokuon + 1);
+                add(head + expand + rest.join(''));
+                if (rest.length && SEION_H[rest[0]]) {
+                    add(head + expand + SEION_H[rest[0]] + rest.slice(1).join(''));
+                }
+                if (rest.length && HANDAKU[rest[0]]) {
+                    add(head + expand + HANDAKU[rest[0]] + rest.slice(1).join(''));
+                }
+            }
+        }
+
+        // ② 清音 / 浊音 / 半浊音互换
+        chars.forEach((ch, i) => {
+            const head = chars.slice(0, i).join('');
+            const tail = chars.slice(i + 1).join('');
+            if (DAKU[ch]) add(head + DAKU[ch] + tail);
+            if (SEION[ch]) add(head + SEION[ch] + tail);
+            if (HANDAKU[ch]) add(head + HANDAKU[ch] + tail);
+            if (SEION_H[ch]) add(head + SEION_H[ch] + tail);
+            if (DAKU_TO_HAN[ch]) add(head + DAKU_TO_HAN[ch] + tail);
+        });
+
+        // ③ 促音脱落（只在无法还原时使用: みっつ → みつ）
+        if (sokuon > 0 && !SOKUON_EXPAND[sokuonKey]) add(kana.replace('っ', ''));
+        if (chars.length > 2 && chars[chars.length - 1] === 'う') {
+            add(chars.slice(0, -1).join(''));
+        }
+
+        return out;
+    }
+    /* ---------- 13. 生成选项 ---------- */
+    // 正向: 题面「3匹」→ 从平假名读音里选
+    function buildForwardOptions(entry) {
+        const banned = readSet(entry.text);
+        const ok = k => !!k && !banned.has(k) && KANA_RE.test(k);
+
+        const sameValue = sameValueEntries(entry);
+        const scopedKana = shuffle(sameValue.filter(inCurrentScope).map(e => e.kana)).filter(ok);
+        const globalKana = shuffle(sameValue.map(e => e.kana)).filter(ok);
+        const sameCatKana = shuffle(
+            ENTRIES.filter(e => e.cat === entry.cat && e.text !== entry.text).map(e => e.kana)
+        ).filter(ok);
+        const allKana = shuffle(ENTRIES.map(e => e.kana)).filter(ok);
+        const mutated = mutateReading(entry.kana).filter(ok);
+
+        const picked = [];
+        // 从候选里取第一个「没被禁用、没重复」的，取到一个就停
+        const take = list => {
+            for (let i = 0; i < list.length; i++) {
+                if (picked.length >= 2) return;
+                if (picked.indexOf(list[i]) === -1) {
+                    picked.push(list[i]);
+                    return;
+                }
+            }
+        };
+
+        // ① 同数字、当前模式内（例: 3匹 → さんぼん / さんこ）
+        take(scopedKana);
+        if (!picked.length) take(globalKana);
+
+        // ② 近似音（前 6 个里随机，避免每次都是同一个）
+        take(shuffle(mutated.slice(0, 6)));
+
+        // ③ 兜底: 同数字 → 同类别 → 全部（按优先级逐层，不能混在一起洗牌）
+        [globalKana, sameCatKana, allKana].forEach(list => {
+            if (picked.length < 2) take(list);
+        });
+
+        return shuffle([entry.kana].concat(picked));
+    }
+
+    // 反向: 题面「さんびき」→ 从数字写法里选
+    function buildReverseOptions(entry) {
+        const promptKana = entry.kana;
+        // 关键过滤: 选项文本的所有合法读法都不能包含题面读音（防止 1回 / 1階 同音歧义）
+        const ok = e => e.text !== entry.text && !readSet(e.text).has(promptKana);
+
+        const unit = entry.text.replace(/^[0-9]+/, '');
+        const sameValueText = shuffle(sameValueEntries(entry).filter(ok).map(e => e.text));
+        // 同一个助数词 / 同一个单位、不同数字（2枚 → 4枚 / 8枚）
+        const sameUnitText = shuffle(
+            ENTRIES.filter(e => e.text !== entry.text && e.text.replace(/^[0-9]+/, '') === unit && ok(e))
+                .map(e => e.text)
+        );
+        const sameCatText = shuffle(
+            ENTRIES.filter(e => e.cat === entry.cat && e.value !== entry.value && ok(e)).map(e => e.text)
+        );
+        const scopedText = shuffle(ENTRIES.filter(e => inCurrentScope(e) && ok(e)).map(e => e.text));
+        const allText = shuffle(ENTRIES.filter(ok).map(e => e.text));
+
+        const picked = [];
+        const push = t => {
+            if (t && picked.length < 2 && picked.indexOf(t) === -1) picked.push(t);
+        };
+
+        // ① 同数字、不同助数词（必须听出是哪个量词）
+        push(sameValueText[0]);
+        // ② 同一个助数词、不同数字（必须听出数字）
+        push(sameUnitText[0]);
+        // ③ 同类别 → 当前模式 → 全部
+        [sameCatText, scopedText, allText].forEach(list => {
+            for (let i = 0; i < list.length && picked.length < 2; i++) push(list[i]);
+        });
+
+        return shuffle([entry.text].concat(picked));
+    }
+
+    /* ---------- 14. 一场 20 题: 正向 10 + 反向 10 ---------- */
+    function buildTasks(pool) {
+        const usable = pool.filter(e => e.quiz);
+        const picked = [];
+        let queue = shuffle(usable);
+
+        while (picked.length < QUESTION_COUNT) {
+            if (!queue.length) queue = shuffle(usable);
+            picked.push(queue.pop());
+        }
+
+        const half = Math.floor(QUESTION_COUNT / 2);
+        const dirs = shuffle(
+            new Array(half).fill('forward').concat(new Array(QUESTION_COUNT - half).fill('reverse'))
+        );
+
+        return picked.map((entry, i) => ({ entry: entry, dir: dirs[i] }));
+    }
+
+    /* ==== CORE-END ==== */
+
+    /* ================== 游戏控制 ================== */
+    const $ = id => document.getElementById(id);
+
+    const optionButtons = Array.prototype.slice.call(document.querySelectorAll('.option-btn'));
+    const questionTextEl = $('questionText');
+    const questionCtxEl = $('questionCtx');
+    const feedbackArea = $('feedbackArea');
+
+    let taskList = [];
+    let taskIndex = 0;
+    let poolEntries = [];
+    let current = null;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let isAnswering = false;
+    let startTime = 0;
+    let soundOn = true;
+
+    function formatTime(seconds) {
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return m + ':' + s;
+    }
+
+    function showScreen(name) {
+        $('startScreen').style.display = name === 'start' ? 'flex' : 'none';
+        $('gameScreen').style.display = name === 'game' ? 'flex' : 'none';
+        $('endScreen').style.display = name === 'end' ? 'flex' : 'none';
+        $('listScreen').style.display = name === 'list' ? 'flex' : 'none';
+    }
+
+    /* ---------- 开始游戏 ---------- */
+    function startGame(modeKey) {
+        mode = modeKey;
+        const cfg = MODES[modeKey];
+        const pool = ENTRIES.filter(e => cfg.cats.indexOf(e.cat) !== -1);
+
+        taskList = buildTasks(pool);
+        poolEntries = pool.filter(e => e.quiz);
+        taskIndex = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        isAnswering = false;
+
+        $('modeLabel').textContent = cfg.label;
+        $('correctCount').textContent = '0';
+        $('totalCount').textContent = String(QUESTION_COUNT);
+        $('progressBar').style.width = '0%';
+        feedbackArea.innerHTML = '';
+
+        startTime = Date.now();
+        showScreen('game');
+        showQuestion();
+    }
+
+    // 答错时替换当前题目: 从当前模式的题池随机抽一道，方向保持不变
+    function makeTask(dir) {
+        const entry = poolEntries[Math.floor(Math.random() * poolEntries.length)];
+        return { entry: entry, dir: dir };
+    }
+
+    /* ---------- 显示题目 ---------- */
+    function showQuestion() {
+        if (taskIndex >= taskList.length) {
+            endGame();
+            return;
+        }
+
+        const task = taskList[taskIndex];
+        const entry = task.entry;
+
+        optionButtons.forEach(btn => {
+            btn.classList.remove('wrong', 'correct-flash');
+            btn.disabled = false;
+            btn.textContent = '';
+            btn.dataset.value = '';
+        });
+        feedbackArea.innerHTML = '';
+        isAnswering = false;
+
+        if (task.dir === 'forward') {
+            // 正向: 看到「3匹」，选读音
+            const options = buildForwardOptions(entry);
+            current = { dir: 'forward', entry: entry, answer: entry.kana, options: options };
+
+            questionCtxEl.innerHTML =
+                '<span class="ctx-emoji">' + entry.emoji + '</span>' +
+                '<span>' + entry.ctx + '</span>';
+            setQuestionText(entry.text, false);
+            renderOptions(options);
+        } else {
+            // 反向: 看到「さんびき」，选数字写法
+            const options = buildReverseOptions(entry);
+            current = { dir: 'reverse', entry: entry, answer: entry.text, options: options };
+
+            const replay = soundAvailable()
+                ? '<button class="replay-btn" onclick="replayPrompt()">🔊 もう いちど</button>'
+                : '';
+            questionCtxEl.innerHTML = '<span>この よみかたは どれ？</span>' + replay;
+            setQuestionText(entry.kana, true);
+            renderOptions(options);
+        }
+    }
+
+    // 题面字号: 按字数自适应，避免长读音（にじゅうよっか）溢出
+    function setQuestionText(text, isKana) {
+        questionTextEl.textContent = text;
+        const len = Array.from(text).length;
+        const widthLimit = isKana ? 15 : 22;   // vw
+        const cap = isKana ? 11 : 14;          // vh
+        const vw = Math.min(widthLimit, 80 / Math.max(len, 1));
+        questionTextEl.style.fontSize = 'min(' + vw.toFixed(2) + 'vw, ' + cap + 'vh)';
+        questionTextEl.style.letterSpacing = len > 5 ? '0' : '0.4vw';
+    }
+
+    function renderOptions(options) {
+        optionButtons.forEach((btn, i) => {
+            const value = options[i];
+            btn.textContent = value;
+            btn.dataset.value = value;
+        });
+    }
+    /* ---------- 判分 ---------- */
+    function checkAnswer(index) {
+        if (isAnswering || !current) return;
+        isAnswering = true;
+
+        const btn = optionButtons[index];
+        const picked = btn.dataset.value;
+        optionButtons.forEach(b => { b.disabled = true; });
+
+        if (picked === current.answer) {
+            correctCount++;
+            $('correctCount').textContent = String(correctCount);
+            updateProgress();
+            btn.classList.add('correct-flash');
+            feedbackArea.innerHTML = '<span class="feedback-o">◯</span>';
+            speak(current.entry.kana);
+
+            setTimeout(() => {
+                if (correctCount >= QUESTION_COUNT) {
+                    endGame();
+                    return;
+                }
+                taskIndex++;
+                showQuestion();
+            }, 420);
+        } else {
+            wrongCount++;
+            btn.classList.add('wrong');
+            // 把正确答案也标绿，让孩子看到正解
+            optionButtons.forEach(b => {
+                if (b.dataset.value === current.answer) b.classList.add('correct-flash');
+            });
+            feedbackArea.innerHTML =
+                '<span class="feedback-x">✘</span>' +
+                '<span class="feedback-answer">せいかい: ' + current.answer + '</span>';
+            speak(current.entry.kana);
+
+            // 答错不推进进度：换一道新题（方向不变）
+            setTimeout(() => {
+                taskList[taskIndex] = makeTask(taskList[taskIndex].dir);
+                showQuestion();
+            }, 1400);
+        }
+    }
+
+    function updateProgress() {
+        const pct = (correctCount / QUESTION_COUNT) * 100;
+        $('progressBar').style.width = pct + '%';
+    }
+
+    /* ---------- 结束 / 重开 ---------- */
+    function endGame() {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        $('finalTime').textContent = formatTime(elapsed);
+        $('finalErrors').textContent = String(wrongCount);
+        $('endSubtitle').textContent = MODES[mode].label;
+        showScreen('end');
+    }
+
+    function restartGame() {
+        showScreen('start');
+    }
+
+    /* ---------- 读音一览（只读，不计分） ---------- */
+    let listTab = 'basic';
+
+    function openList() {
+        renderList(listTab);
+        showScreen('list');
+    }
+
+    function closeList() {
+        if (soundAvailable()) {
+            window.speechSynthesis.cancel();
+        }
+        showScreen('start');
+    }
+
+    function switchListTab(key) {
+        renderList(key);
+    }
+
+    function groupTitle(tabKey, unit) {
+        if (tabKey === 'basic') return 'すうじ（0〜10）';
+        if (tabKey === 'native') return '1つ〜10（かぞえる とき）';
+        if (tabKey === 'date') return 'ひづけ（1日〜31日）';
+        if (tabKey === 'month') return 'つき（1月〜12月）';
+        if (tabKey === 'clock') {
+            return unit === '時' ? 'なんじ（1時〜12時）' : 'なんぷん（1分〜10分）';
+        }
+        return unit + ' の よみかた';
+    }
+
+    function renderList(tabKey) {
+        const tab = LIST_TABS.filter(t => t.key === tabKey)[0] || LIST_TABS[0];
+        listTab = tab.key;
+
+        // ① 分类 chip（带条数）
+        $('tabRow').innerHTML = LIST_TABS.map(t => {
+            const active = t.key === tab.key ? ' active' : '';
+            return '<button class="tab-chip' + active + '" onclick="switchListTab(\'' + t.key + '\')">' +
+                t.label + '<span class="tab-count">' + entriesForTab(t).length + '</span></button>';
+        }).join('');
+
+        // ② 按单位分组（個 / 匹 / 日 / 月 / 時 / 分 …），保持数据表顺序
+        const items = entriesForTab(tab);
+        const groups = [];
+        const groupIndex = {};
+        items.forEach(e => {
+            const unit = unitOf(e.text);
+            if (groupIndex[unit] === undefined) {
+                groupIndex[unit] = groups.length;
+                groups.push({ unit: unit, items: [] });
+            }
+            groups[groupIndex[unit]].items.push(e);
+        });
+
+        // ③ 卡片网格
+        $('listScroll').innerHTML = groups.map(g => {
+            const cards = g.items.map(e => {
+                const alt = e.alts.length
+                    ? '<span class="read-alt">・' + e.alts.join(' ・ ') + '</span>'
+                    : '';
+                return '<button class="read-card" data-kana="' + e.kana + '">' +
+                    '<span class="read-text">' + e.text + '</span>' +
+                    '<span class="read-kana">' + e.kana + '<span class="read-speaker">🔊</span></span>' +
+                    alt +
+                    '</button>';
+            }).join('');
+            return '<div class="group-title">' + groupTitle(tab.key, g.unit) + '</div>' +
+                '<div class="read-grid">' + cards + '</div>';
+        }).join('');
+
+        $('listScreen').dataset.tab = tab.key;
+        $('listScroll').scrollTop = 0;
+        $('listScreen').classList.toggle('no-tts', !soundAvailable());
+    }
+
+    // 点卡片 → 读这个读音
+    (function bindListClicks() {
+        const scroll = $('listScroll');
+        if (!scroll || !scroll.addEventListener) return;
+        scroll.addEventListener('click', function (ev) {
+            const card = ev.target && ev.target.closest ? ev.target.closest('.read-card') : null;
+            if (!card) return;
+            speak(card.dataset.kana);
+            card.classList.add('tapped');
+            setTimeout(() => card.classList.remove('tapped'), 260);
+        });
+    })();
+
+    /* ---------- 语音（浏览器内置 TTS，无外部资源） ---------- */
+    function soundAvailable() {
+        return typeof window.speechSynthesis !== 'undefined'
+            && typeof window.SpeechSynthesisUtterance !== 'undefined';
+    }
+
+    function pickJapaneseVoice() {
+        if (!soundAvailable()) return null;
+        const voices = window.speechSynthesis.getVoices() || [];
+        for (let i = 0; i < voices.length; i++) {
+            if (/^ja/i.test(voices[i].lang)) return voices[i];
+        }
+        return null;
+    }
+
+    function speak(text) {
+        if (!soundOn || !soundAvailable()) return;
+        try {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ja-JP';
+            utter.rate = 0.85;
+            utter.pitch = 1.05;
+            const voice = pickJapaneseVoice();
+            if (voice) utter.voice = voice;
+            window.speechSynthesis.speak(utter);
+        } catch (err) {
+            // 语音不可用时静默降级
+        }
+    }
+
+    function replayPrompt() {
+        if (current) speak(current.entry.kana);
+    }
+
+    function toggleSound() {
+        soundOn = !soundOn;
+        const label = soundOn ? '🔊' : '🔇';
+        const gameBtn = $('soundBtn');
+        const listBtn = $('listSoundBtn');
+        if (gameBtn) gameBtn.textContent = label;
+        if (listBtn) listBtn.textContent = label;
+        if (!soundOn && soundAvailable()) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    /* ---------- 初始化 ---------- */
+    (function init() {
+        $('totalCount').textContent = String(QUESTION_COUNT);
+
+        if (!soundAvailable()) {
+            $('soundBtn').style.display = 'none';
+            $('listSoundBtn').style.display = 'none';
+        } else {
+            // 部分浏览器异步加载语音列表，先预热
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = function () {
+                window.speechSynthesis.getVoices();
+            };
+        }
+    })();
+</script>
+</body>
+</html>

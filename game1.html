@@ -423,7 +423,7 @@
     <div id="gameScreen">
         <!-- 顶部信息栏 -->
         <div class="top-bar">
-            <div class="stat-item">
+            <div class="stat-item" id="timerStat">
                 <span class="icon">⏱️</span>
                 <span id="timerDisplay">00:00</span>
             </div>
@@ -431,7 +431,7 @@
                 <span class="icon">✅</span>
                 <span id="correctCount">0</span> / 20
             </div>
-            <div class="stat-item">
+            <div class="stat-item" id="wrongStat">
                 <span class="icon">❌</span>
                 <span id="wrongCount">0</span>
             </div>
@@ -635,6 +635,9 @@
         $('timerDisplay').textContent = '00:00';
         $('progressBar').style.width = '0%';
         feedbackArea.innerHTML = '';
+
+        $('timerStat').style.display = 'none';
+        $('wrongStat').style.display = 'none';
 
         $('startScreen').style.display = 'none';
         $('gameScreen').style.display = 'flex';
